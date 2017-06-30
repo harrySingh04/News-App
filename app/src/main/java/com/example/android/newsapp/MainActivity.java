@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,29 +24,45 @@ import java.net.URL;
 import java.security.Key;
 import java.util.ArrayList;
 
+import static android.R.attr.author;
+import static android.R.attr.description;
 import static com.example.android.newsapp.Utilities.JsonDataExtract.jsonParseNews;
 
 public class MainActivity extends AppCompatActivity {
 
-        private TextView newsTextView;
-        private TextView newsDesView;
-        private TextView newsAutView;
-        private TextView newsPubView;
+        //private TextView newsTextView;
+        //private TextView newsDesView;
+        //private TextView newsAutView;
+        //private TextView newsPubView;
         private ProgressBar progressBar;
+
+        private NewsAdapter newsAdapter;
+        private RecyclerView recyclerView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        newsTextView = (TextView) findViewById(R.id.news_text_view);
+       // newsTextView = (TextView) findViewById(R.id.news_text_view);
        /* newsDesView = (TextView) findViewById(R.id.news_des);
         newsAutView = (TextView) findViewById(R.id.news_author);
         newsPubView = (TextView) findViewById(R.id.news_pub);*/
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        recyclerView = (RecyclerView) findViewById(R.id.news_recycyler_view);
 
         progressBar.setVisibility(View.VISIBLE);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+
+        recyclerView.setHasFixedSize(true);
+
+        recyclerView.setVisibility(View.VISIBLE);
+
+        newsAdapter = new NewsAdapter();
 
         loadNewsData();
     }
@@ -101,7 +119,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostExecute(JSONArray jsonArray) {
 
             ArrayList<String> newsDetails = new ArrayList<>();
-            String title,description,author,publishedAt;
+            String[] title = new String[jsonArray.length()];
+            String[] desc=new String[jsonArray.length()];
+            String[] time=new String[jsonArray.length()];
             if(jsonArray!=null) {
                 for (int i = 0; i < jsonArray.length(); i++) {
 
@@ -109,21 +129,21 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                         JSONObject eachRowData = jsonArray.getJSONObject(i);
 
+                        title[i] = eachRowData.getString("title");
+                        desc[i]=eachRowData.getString("description");
+                        time[i] = eachRowData.getString("publishedAt")
 
-                        title = eachRowData.getString("title");
-                        description = eachRowData.getString("description");
-                        author = eachRowData.getString("author");
-                        publishedAt = eachRowData.getString("publishedAt");
-
-                        newsTextView.append(title+"\n\n"+description+"\n\n"+author+"\n\n");
-                        //newsAutView.append(eachRowData.getString("author"));
-                       // newsPubView.append(eachRowData.getString("publishedAt" + "\n\n\n"));
 
                     } catch (Exception e) {
                         e.printStackTrace();
 
                     }
                 }
+
+                newsAdapter.setTitle(title);
+                newsAdapter.setDesc(desc);
+                newsAdapter.setTime(time);
+                recyclerView.setAdapter(newsAdapter);
             }
         }
     }
