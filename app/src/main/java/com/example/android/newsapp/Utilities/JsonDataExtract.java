@@ -15,35 +15,13 @@ public class JsonDataExtract {
  * and will be assigned to the view of the App.
  */
 
-    private static String title;
+    private String title;
+    private String descrption;
+    private String publishedAt;
+    private String urlToSite;
+    private String imageContent;
 
-    public static String getTitle() {
-        return title;
-    }
 
-    public static void setTitle(String title) {
-        JsonDataExtract.title = title;
-    }
-
-    public static String getDescrption() {
-        return descrption;
-    }
-
-    public static void setDescrption(String descrption) {
-        JsonDataExtract.descrption = descrption;
-    }
-
-    public static String getImageContent() {
-        return imageContent;
-    }
-
-    public static void setImageContent(String imageContent) {
-        JsonDataExtract.imageContent = imageContent;
-
-    }
-
-    private static String descrption;
-    private static String imageContent;
 
     public static final String PARAM_STATUS = "status";
     public final static String PARAM_ARTICLES = "articles";
@@ -60,11 +38,10 @@ public class JsonDataExtract {
 
            JSONObject newsData = new JSONObject(jsonData);
 
-        if(newsData.get(PARAM_STATUS).equals("ok")) {
+              if(newsData.get(PARAM_STATUS).equals("ok")) {
 
-            JSONArray articlesData = newsData.getJSONArray(PARAM_ARTICLES);
+                    JSONArray articlesData = newsData.getJSONArray(PARAM_ARTICLES);
 
-          //  JsonDataExtract[] newsDataArray = new JsonDataExtract[articlesData.length()];
 
            return articlesData;
 

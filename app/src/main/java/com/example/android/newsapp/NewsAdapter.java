@@ -7,20 +7,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.newsapp.Utilities.NewsItemModel;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by ishpr on 6/29/2017.
  */
 
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterViewHolder> {
-    private String[] titleData;
-    private String[] desData;
-    private String[] timeData;
-    public NewsAdapter()
-    {
+    private List<NewsItemModel> dataArray = new ArrayList<NewsItemModel>();
 
+    NewsListData newsClicked;
+
+    public NewsAdapter(NewsListData listener)
+    {
+        newsClicked = listener;
 
     }
 
+    public interface  NewsListData{
+
+        void onClickItemListener(int clickedIndex);
+    }
     @Override
     public NewsAdapter.NewsAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -35,40 +45,30 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
 
     @Override
     public void onBindViewHolder(NewsAdapter.NewsAdapterViewHolder holder, int position) {
-        holder.newsArticle.setText(titleData[position]);
-        holder.newsDes.setText(desData[position]);
-        holder.newsTime.setText(timeData[position]);
+
+        holder.newsArticle.setText(dataArray.get(position).getTitle());
+        holder.newsDes.setText(dataArray.get(position).getDesc());
+        holder.newsTime.setText(dataArray.get(position).getPublishedAt());
     }
 
     @Override
     public int getItemCount() {
-        if (titleData==null )
+        if (dataArray==null )
 
         return 0;
         else
-            return titleData.length;
+            return dataArray.size();
     }
 
-    public void setTitle(String[] title)
+    public void setDataArray(List<NewsItemModel> jsonData)
     {
-        titleData = title;
-        notifyDataSetChanged();
-
-    }
-    public void setDesc(String[] desc)
-    {
-        desData = desc;
-        notifyDataSetChanged();
-
-    }
-    public void setTime(String[] time)
-    {
-        timeData = time;
+        dataArray = jsonData;
         notifyDataSetChanged();
 
     }
 
-    public class NewsAdapterViewHolder extends RecyclerView.ViewHolder{
+
+    public class NewsAdapterViewHolder extends RecyclerView.ViewHolder implements  View.OnClickListener{
             final public TextView newsArticle;
             final public TextView newsDes;
             final public TextView newsTime;
@@ -76,12 +76,19 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
         public NewsAdapterViewHolder(View view)
         {
             super(view);
-            newsArticle = (TextView) view.findViewById(R.id.news_text_view);
+            newsArticle = (TextView) view.findViewById(R.id.text_news_title);
             newsDes = (TextView) view.findViewById(R.id.text_news_des);
             newsTime = (TextView) view.findViewById(R.id.text_news_time);
 
+            view.setOnClickListener(this);
+
         }
 
+        @Override
+        public void onClick(View v) {
+            int clickPos = getAdapterPosition();
+            newsClicked.onClickItemListener(clickPos);
+        }
     }
 
 

@@ -7,18 +7,21 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/text_news_title"
+        android:padding="10dp"
     android:textSize="22sp"
     android:textStyle="bold"    />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:id="@+id/text_news_des"
-        android:textSize="16sp"/>
+        android:textSize="18sp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="10dp"
         android:id="@+id/text_news_time"
-        android:textSize="10dp"
+        android:textSize="16sp"
         android:fontFamily="sans-serif-condensed"
         />
 </LinearLayout>

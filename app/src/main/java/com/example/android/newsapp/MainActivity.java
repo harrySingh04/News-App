@@ -1,5 +1,6 @@
 package com.example.android.newsapp;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -11,24 +12,29 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.newsapp.Utilities.JsonDataExtract;
 import com.example.android.newsapp.Utilities.KeyClass;
 import com.example.android.newsapp.Utilities.NetworkUtlis;
+import com.example.android.newsapp.Utilities.NewsItemModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.R.attr.author;
+import static android.R.attr.data;
 import static android.R.attr.description;
 import static com.example.android.newsapp.Utilities.JsonDataExtract.jsonParseNews;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsListData {
 
         //private TextView newsTextView;
         //private TextView newsDesView;
@@ -39,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
         private NewsAdapter newsAdapter;
         private RecyclerView recyclerView;
 
+       List<NewsItemModel> dataArray = new ArrayList<NewsItemModel>() ;
+         String[] title;
+         String[] desc;
+         String[] time;
+
+        Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setVisibility(View.VISIBLE);
 
-        newsAdapter = new NewsAdapter();
+        newsAdapter = new NewsAdapter(this);
 
         loadNewsData();
     }
@@ -115,13 +127,14 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+
         @Override
     protected void onPostExecute(JSONArray jsonArray) {
 
             ArrayList<String> newsDetails = new ArrayList<>();
-            String[] title = new String[jsonArray.length()];
-            String[] desc=new String[jsonArray.length()];
-            String[] time=new String[jsonArray.length()];
+
+           // dataArray = new NewsItemModel[jsonArray.length()];
+
             if(jsonArray!=null) {
                 for (int i = 0; i < jsonArray.length(); i++) {
 
@@ -129,10 +142,8 @@ public class MainActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                         JSONObject eachRowData = jsonArray.getJSONObject(i);
 
-                        title[i] = eachRowData.getString("title");
-                        desc[i]=eachRowData.getString("description");
-                        time[i] = eachRowData.getString("publishedAt")
-
+                        dataArray.add(new NewsItemModel(eachRowData.getString("title"),eachRowData.getString("description"),
+                                eachRowData.getString("publishedAt"),eachRowData.getString("url"),eachRowData.getString("urlToImage")));
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -140,11 +151,28 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                newsAdapter.setTitle(title);
-                newsAdapter.setDesc(desc);
-                newsAdapter.setTime(time);
+                newsAdapter.setDataArray(dataArray);
                 recyclerView.setAdapter(newsAdapter);
             }
         }
+
+
+
+    }
+
+
+
+    @Override
+    public void onClickItemListener(int clickedIndex) {
+
+
+        Uri webpage = Uri.parse(dataArray.get(clickedIndex).getUrlTo());
+
+        Intent intent = new Intent(Intent.ACTION_VIEW, webpage);
+
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+
     }
 }
