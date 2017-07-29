@@ -1,12 +1,14 @@
 package com.example.android.newsapp;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.newsapp.Data.NewsItemContract;
 import com.example.android.newsapp.Utilities.NewsItemModel;
 
 import java.util.ArrayList;
@@ -21,9 +23,13 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
 
     NewsListData newsClicked;
 
-    public NewsAdapter(NewsListData listener)
+   //Cursor for the Database record
+    Cursor nCursor;
+
+    public NewsAdapter(NewsListData listener,Cursor cursor)
     {
         newsClicked = listener;
+        nCursor = cursor;
 
     }
 
@@ -46,9 +52,19 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
     @Override
     public void onBindViewHolder(NewsAdapter.NewsAdapterViewHolder holder, int position) {
 
-        holder.newsArticle.setText(dataArray.get(position).getTitle());
-        holder.newsDes.setText(dataArray.get(position).getDesc());
-        holder.newsTime.setText(dataArray.get(position).getPublishedAt());
+        if (!nCursor.moveToPosition(position))
+            return;
+
+        // Update the view holder with the information needed to display
+        String title = nCursor.getString(nCursor.getColumnIndex(NewsItemContract.NewsItemEntry.COLUMN_TITLE));
+        String desc = nCursor.getString(nCursor.getColumnIndex(NewsItemContract.NewsItemEntry.COLUMN_DESC));
+        String publishedAt = nCursor.getString(nCursor.getColumnIndex(NewsItemContract.NewsItemEntry.COLUMN_PUBLISHED_AT));
+        String urlTo = nCursor.getString(nCursor.getColumnIndex(NewsItemContract.NewsItemEntry.COLUMN__URL_TO));
+        String urlToImage = nCursor.getString(nCursor.getColumnIndex(NewsItemContract.NewsItemEntry.COLUMN_URL_TO_IMAGE));
+
+        holder.newsArticle.setText(title);
+        holder.newsDes.setText(desc);
+        holder.newsTime.setText(publishedAt);
     }
 
     @Override
@@ -58,6 +74,16 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
         return 0;
         else
             return dataArray.size();
+    }
+
+    //  A new function called swapCursor that takes the new cursor and returns void
+    public void swapCursor(Cursor cursor) {
+        // Check if the current cursor is not null, and close it if so
+        if(nCursor!=null)
+            nCursor.close();
+        nCursor = cursor;
+        if(nCursor!=null)
+            this.notifyDataSetChanged();
     }
 
     public void setDataArray(List<NewsItemModel> jsonData)

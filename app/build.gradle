@@ -26,6 +26,8 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+//Adding the dependencies for the firebase job dispatcher
+    compile 'com.firebase:firebase-jobdispatcher:0.7.0'
     compile 'com.android.support:recyclerview-v7:25.1.1'
     testCompile 'junit:junit:4.12'
 }
