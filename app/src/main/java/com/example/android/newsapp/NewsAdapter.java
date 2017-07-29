@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.newsapp.Data.NewsItemContract;
@@ -13,6 +14,7 @@ import com.example.android.newsapp.Utilities.NewsItemModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by ishpr on 6/29/2017.
@@ -26,6 +28,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
    //Cursor for the Database record
     Cursor nCursor;
 
+    Context context;
     public NewsAdapter(NewsListData listener,Cursor cursor)
     {
         newsClicked = listener;
@@ -39,7 +42,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
     }
     @Override
     public NewsAdapter.NewsAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
+         context = parent.getContext();
         LayoutInflater layoutIdList = LayoutInflater.from(context);
         int layoutIdForList = R.layout.news_layout;
         boolean shouldAttachImmediately = false;
@@ -51,6 +54,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
 
     @Override
     public void onBindViewHolder(NewsAdapter.NewsAdapterViewHolder holder, int position) {
+
 
         if (!nCursor.moveToPosition(position))
             return;
@@ -65,6 +69,15 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
         holder.newsArticle.setText(title);
         holder.newsDes.setText(desc);
         holder.newsTime.setText(publishedAt);
+
+        if(urlToImage!=null)
+        {
+            Picasso.with(context)
+                    .load(urlToImage)
+                    .into(holder.imageView);
+
+        }
+
     }
 
     @Override
@@ -98,6 +111,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
             final public TextView newsArticle;
             final public TextView newsDes;
             final public TextView newsTime;
+            final public ImageView imageView;
 
         public NewsAdapterViewHolder(View view)
         {
@@ -105,6 +119,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
             newsArticle = (TextView) view.findViewById(R.id.text_news_title);
             newsDes = (TextView) view.findViewById(R.id.text_news_des);
             newsTime = (TextView) view.findViewById(R.id.text_news_time);
+            imageView=(ImageView) view.findViewById(R.id.news_image);
 
             view.setOnClickListener(this);
 

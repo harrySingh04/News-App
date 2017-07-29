@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -28,6 +29,7 @@ import com.example.android.newsapp.Utilities.JsonDataExtract;
 import com.example.android.newsapp.Utilities.KeyClass;
 import com.example.android.newsapp.Utilities.NetworkUtlis;
 import com.example.android.newsapp.Utilities.NewsItemModel;
+import com.example.android.newsapp.Utilities.NewsJobSchedule;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -143,10 +145,12 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsL
             newsAdapter.setDataArray(dataArray);
             recyclerView.setAdapter(newsAdapter);*/
 
-           retrieveDb();
+           retrieveDb(db);
 
 
         }
+
+        NewsJobSchedule.scheduleRefresh(this);
 
 
     }
@@ -154,11 +158,31 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsL
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.newsmenu, menu);
+
+
         return true;
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button_brown, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        switch (item.getItemId()) {
+            case R.id.refresh:
+                retrieveDb(db);
+                 newsAdapter.swapCursor(getAllNews());
 
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+
+    }
     public  void loadNewsData()
     {
         String searchString = "the-next-web";
@@ -256,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsL
                       // dataArray.add(new NewsItemModel(eachRowData.getString("title"), eachRowData.getString("description"),
                             //   eachRowData.getString("publishedAt"), eachRowData.getString("url"), eachRowData.getString("urlToImage")));
                   //Adding data into the db
-                       addNewsEntryDb(eachRowData.getString("title"), eachRowData.getString("description"),
+                       NewsDbHelper.addNewsEntryDb(db,eachRowData.getString("title"), eachRowData.getString("description"),
                                eachRowData.getString("publishedAt"), eachRowData.getString("url"), eachRowData.getString("urlToImage"));
                    } catch (Exception e) {
                        e.printStackTrace();
@@ -266,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsL
 
                // Calling the method that is retrieving the data from the database and storing
                // in the recycler view and display
-               retrieveDb();
+               retrieveDb(db);
 
            }
        }
@@ -291,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsL
 
     }
 
-    public long addNewsEntryDb(String title,String desc,String publishedAt,String urlTo,String urlImageTo)
+    /*public long addNewsEntryDb(String title,String desc,String publishedAt,String urlTo,String urlImageTo)
     {
         ContentValues cv = new ContentValues();
 
@@ -310,7 +334,7 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsL
         return db.insert(NewsItemContract.NewsItemEntry.TABLE_NAME,null,cv);
 
 
-    }
+    }*/
 
     // Cursor containing the list of guests
     private Cursor getAllNews() {
@@ -325,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.NewsL
         );
     }
     //Method to retrieve data from the database and storing in the Recycler view
-    public void retrieveDb()
+    public void retrieveDb(SQLiteDatabase db)
     {
 
 
